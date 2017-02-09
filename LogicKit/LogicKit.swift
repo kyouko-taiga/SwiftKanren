@@ -76,6 +76,8 @@ struct Substitution {
 
     fileprivate var storage = [Variable: Term]()
 
+    public typealias Association = (variable: Variable, term: Term)
+
     subscript(_ key: Term) -> Term {
         // If the the given key isn't a variable, we should just give it back.
         guard let k = key as? Variable else {
@@ -98,10 +100,10 @@ struct Substitution {
         return key
     }
 
-    func extended(with association: (key: Variable, term: Term)) -> Substitution {
+    func extended(with association: Association) -> Substitution {
         // TODO: Check for introduced circularity.
         var result = self
-        result.storage[association.key] = association.term
+        result.storage[association.variable] = association.term
         return result
     }
 
@@ -118,9 +120,9 @@ struct Substitution {
         // Unifying an lvar term with some other value creates a new entry in
         // the substitution.
         if walkedU is Variable {
-            return self.extended(with: (key: walkedU as! Variable, term: walkedV))
+            return self.extended(with: (variable: walkedU as! Variable, term: walkedV))
         } else if walkedV is Variable {
-            return self.extended(with: (key: walkedV as! Variable, term: walkedU))
+            return self.extended(with: (variable: walkedV as! Variable, term: walkedU))
         }
 
         return nil
@@ -130,7 +132,7 @@ struct Substitution {
         let walked = self[term]
 
         if walked is Variable {
-            return self.extended(with: (key: walked as! Variable, term: Unassigned()))
+            return self.extended(with: (variable: walked as! Variable, term: Unassigned()))
         }
 
         return self
@@ -149,10 +151,18 @@ struct Substitution {
 
 extension Substitution: Sequence {
 
-    typealias Iterator = DictionaryIterator<Variable, Term>
+    typealias Iterator = AnyIterator<Association>
 
     func makeIterator() -> Iterator {
-        return self.storage.makeIterator()
+        var it = self.storage.makeIterator()
+
+        return AnyIterator {
+            if let (variable, term) = it.next() {
+                return (variable: variable, term: self[term])
+            }
+
+            return nil
+        }
     }
 
 }
