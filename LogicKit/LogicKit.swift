@@ -72,7 +72,7 @@ public struct Unassigned: Term {
 }
 
 
-struct Substitution {
+public struct Substitution {
 
     fileprivate var storage = [Variable: Term]()
 
@@ -148,12 +148,9 @@ struct Substitution {
 
 }
 
-
 extension Substitution: Sequence {
 
-    typealias Iterator = AnyIterator<Association>
-
-    func makeIterator() -> Iterator {
+    public func makeIterator() -> AnyIterator<Association> {
         var it = self.storage.makeIterator()
 
         return AnyIterator {
@@ -243,7 +240,38 @@ public enum Stream {
             return self
 
         case .immature(thunk: let thunk):
-            return thunk()
+            return thunk().realize()
+        }
+    }
+
+}
+
+extension Stream: Sequence {
+
+    public func makeIterator() -> AnyIterator<Substitution> {
+        var it = self
+
+        return AnyIterator {
+
+            // Realize the iterated stream here, so that we its state is
+            // computed as lazily as possible (i.e. when the iterator's next()
+            // method is called).
+
+            switch it.realize() {
+            case .empty:
+                // Return nothing for empty stream, ending the sequence.
+                return nil
+
+            case .mature(head: let state, next: let successor):
+                // Return the realized substitution and advance the iterator.
+                it = successor
+                return state.substitution
+
+            case .immature(thunk: _):
+                assertionFailure("realize shouldn't produce immature streams")
+            }
+
+            return nil
         }
     }
 

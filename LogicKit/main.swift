@@ -6,18 +6,18 @@
 //  Copyright © 2017 University of Geneva. All rights reserved.
 //
 
-let g0 = Variable(name: "y") === Variable(name: "x")
-let g1 = Variable(name: "x") === Value(4) && Variable(name: "y") === Variable(name: "x")
-let g2 = g0 || g1
+let x = Variable(name: "x")
+let y = Variable(name: "y")
 
 
+let g = x === y && fresh { z in (x === z || x === y) && z === Value(4) }
+let stream = g(State())
 
-let s = g2(State())
-switch s {
-case .mature(head: let h, next: let n):
-    for (variable, value) in h.substitution.reified() {
+
+for substitution in stream.prefix(5) {
+    for (variable, value) in substitution.reified() {
         print(variable.name, value)
     }
-default:
-    break
+
+    print(" ")
 }
