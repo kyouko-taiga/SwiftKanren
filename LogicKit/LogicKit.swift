@@ -8,6 +8,11 @@
 
 public protocol Term {
 
+    // We can't make the Term conform to Equatable, as we need to use within
+    // heterogeneous collections. Hence we can't have a safe requirements
+    // (see WWDC 2015 - session 408). Similarly, we can't require conforming
+    // types to implement the global equality operator (==), as the various
+    // overloads would become ambiguous without a self requirement.
     func equals(other: Term) -> Bool
 
 }
@@ -49,10 +54,6 @@ public struct Value<T: Equatable>: Term {
     }
 
     public func equals(other: Term) -> Bool {
-        if other is Variable {
-            return true
-        }
-
         if let rhs = (other as? Value<T>) {
             return rhs.value == self.value
         }
