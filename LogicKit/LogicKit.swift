@@ -13,7 +13,14 @@ public protocol Term {
     // (see WWDC 2015 - session 408). Similarly, we can't require conforming
     // types to implement the global equality operator (==), as the various
     // overloads would become ambiguous without a self requirement.
-    func equals(other: Term) -> Bool
+    func equals(_ other: Term) -> Bool
+
+}
+
+
+public protocol Superterm: Term {
+
+    static func build(fromProperties properties: [(label: String?, value: Any)]) -> Self
 
 }
 
@@ -22,7 +29,7 @@ public struct Variable: Term {
 
     public let name: String
 
-    public func equals(other: Term) -> Bool {
+    public func equals(_ other: Term) -> Bool {
         if other is Variable {
             return (other as! Variable).name == self.name
         }
@@ -47,13 +54,13 @@ extension Variable: Hashable {
 
 public struct Value<T: Equatable>: Term {
 
-    private let value: T
+    fileprivate let value: T
 
     public init(_ val: T) {
         self.value = val
     }
 
-    public func equals(other: Term) -> Bool {
+    public func equals(_ other: Term) -> Bool {
         if let rhs = (other as? Value<T>) {
             return rhs.value == self.value
         }
@@ -63,10 +70,18 @@ public struct Value<T: Equatable>: Term {
 
 }
 
+extension Value: Equatable {
+
+    public static func == <T: Equatable>(lhs: Value<T>, rhs: Value<T>) -> Bool {
+        return lhs.value == rhs.value
+    }
+
+}
+
 
 public struct Unassigned: Term {
 
-    public func equals(other: Term) -> Bool {
+    public func equals(_ other: Term) -> Bool {
         return false
     }
 
@@ -80,24 +95,29 @@ public struct Substitution {
     public typealias Association = (variable: Variable, term: Term)
 
     subscript(_ key: Term) -> Term {
-        // If the the given key isn't a variable, we should just give it back.
+        // If the given key is a superterm, we have to walk its subterms.
+        if let superterm = key as? Superterm {
+            let mirror = Mirror(reflecting: superterm)
+            let properties = mirror.children.map { label, value in
+                return (value is Term)
+                    ? (label: label, value: self[value as! Term])
+                    : (label: label, value: value)
+            }
+            return type(of: superterm).build(fromProperties: properties)
+        }
+
+        // If the the given key isn't a variable, we can just give it back.
         guard let k = key as? Variable else {
             return key
         }
 
         if let rhs = self.storage[k] {
-            switch rhs {
-            case let variable as Variable:
-                // If the rhs of the substitution is a variable, we should
-                // search for this variable's substitution.
-                return self[variable]
-
-            default:
-                return rhs
-            }
+            // Continue walking in case the rhs is another variable, or a
+            // superterm whose subterms should also be walked.
+            return self[rhs]
         }
 
-        // We give back the variabe if is not associated.
+        // We give back the variable if is not associated.
         return key
     }
 
@@ -112,28 +132,85 @@ public struct Substitution {
         let walkedU = self[u]
         let walkedV = self[v]
 
-        // Terms that walk to equal values always unify, but add nothing
-        // to the substitution.
-        if walkedU.equals(other: walkedV) {
+        // Terms that walk to equal values always unify, but add nothing to
+        // the substitution.
+        if walkedU.equals(walkedV) {
             return self
         }
 
-        // Unifying an lvar term with some other value creates a new entry in
-        // the substitution.
+        // Unifying a logic variable with some other term creates a new entry
+        // in the substitution.
         if walkedU is Variable {
             return self.extended(with: (variable: walkedU as! Variable, term: walkedV))
         } else if walkedV is Variable {
             return self.extended(with: (variable: walkedV as! Variable, term: walkedU))
         }
 
+        // If the walked values of u and of v are superterms, then unifying them
+        // boils down to unifying their subterms.
+        if (walkedU is Superterm) && (walkedV is Superterm) {
+            return self.unifyingSubterms(walkedU as! Superterm, walkedV as! Superterm)
+        }
+
         return nil
     }
 
-    func reifying(_ term: Term) -> Substitution? {
+    private func unifyingSubterms(_ u: Superterm, _ v: Superterm) -> Substitution? {
+        // Unifying terms of different types always fail.
+        guard type(of: u) == type(of: v) else {
+            return nil
+        }
+
+        let reflectedU = Mirror(reflecting: u)
+        let reflectedV = Mirror(reflecting: v)
+        guard reflectedU.displayStyle == reflectedV.displayStyle else {
+            return nil
+        }
+
+        // Unifying uninspectable types always fail, because there's now way
+        // to decide whether u and v are equal.
+        if (reflectedU.displayStyle != nil) {
+            return nil
+        }
+
+        // Unifying terms of different lengths (e.g. [1, x, 3] and [1, x])
+        // always fail.
+        if reflectedU.children.count != reflectedV.children.count {
+            return nil
+        }
+
+        var result: Substitution = self
+        for (lhs, rhs) in zip(reflectedU.children, reflectedV.children) {
+            if let su = lhs.value as? Term, let sv = rhs.value as? Term {
+                if let unification = result.unifying(su, sv) {
+                    result = unification
+                } else {
+                    // Unification fails when subterms can't be unified.
+                    return nil
+                }
+            }
+        }
+
+        return result
+    }
+
+    func reifying(_ term: Term) -> Substitution {
         let walked = self[term]
 
         if walked is Variable {
             return self.extended(with: (variable: walked as! Variable, term: Unassigned()))
+        }
+
+        // If the walked value of the term is a superterm, its subterms should
+        // be reified as well.
+        if walked is Superterm {
+            let mirror = Mirror(reflecting: walked)
+            var result = self
+            for child in mirror.children.flatMap({ $0.value as? Term }) {
+                result = result.reifying(child)
+            }
+
+            return result
         }
 
         return self
@@ -142,7 +219,7 @@ public struct Substitution {
     func reified() -> Substitution {
         var result = self
         for variable in self.storage.keys {
-            result = result.reifying(variable) ?? result
+            result = result.reifying(variable)
         }
         return result
     }

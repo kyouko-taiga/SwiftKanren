@@ -254,6 +254,7 @@
 				75EC63D01E4A0E4D00335B45 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
