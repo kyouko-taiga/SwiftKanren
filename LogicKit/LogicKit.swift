@@ -51,18 +51,27 @@ extension Variable: Hashable {
 
 }
 
+extension Variable: CustomStringConvertible {
+
+    public var description: String {
+        return self.name
+    }
+    
+}
+
+
 
 public struct Value<T: Equatable>: Term {
 
-    fileprivate let value: T
+    fileprivate let wrapped: T
 
     public init(_ val: T) {
-        self.value = val
+        self.wrapped = val
     }
 
     public func equals(_ other: Term) -> Bool {
         if let rhs = (other as? Value<T>) {
-            return rhs.value == self.value
+            return rhs.wrapped == self.wrapped
         }
 
         return false
@@ -73,16 +82,53 @@ public struct Value<T: Equatable>: Term {
 extension Value: Equatable {
 
     public static func == <T: Equatable>(lhs: Value<T>, rhs: Value<T>) -> Bool {
-        return lhs.value == rhs.value
+        return lhs.wrapped == rhs.wrapped
+    }
+
+}
+
+extension Value: CustomStringConvertible {
+
+    public var description: String {
+        return String(describing: self.wrapped)
     }
 
 }
 
 
-public struct Unassigned: Term {
+public struct Unassigned: Term, CustomStringConvertible {
+
+    private static var variables = [Variable: Int]()
+    private static let unicodeSubscripts = [
+        "\u{2080}", "\u{2081}", "\u{2082}", "\u{2083}", "\u{2084}",
+        "\u{2085}", "\u{2086}", "\u{2087}", "\u{2088}", "\u{2089}"]
+
+    private var id: Int
+
+    fileprivate init(_ variable: Variable) {
+        if Unassigned.variables[variable] == nil {
+            Unassigned.variables[variable] = Unassigned.variables.count
+        }
+        self.id = Unassigned.variables[variable]!
+    }
 
     public func equals(_ other: Term) -> Bool {
         return false
+    }
+
+    public var description: String {
+        var suffix = ""
+        if self.id == 0 {
+            suffix = Unassigned.unicodeSubscripts[0]
+        } else {
+            var number = self.id
+            while number > 0 {
+                suffix = Unassigned.unicodeSubscripts[number % 10] + suffix
+                number /= 10
+            }
+        }
+
+        return "_" + suffix
     }
 
 }
@@ -197,8 +243,8 @@ public struct Substitution {
     func reifying(_ term: Term) -> Substitution {
         let walked = self[term]
 
-        if walked is Variable {
-            return self.extended(with: (variable: walked as! Variable, term: Unassigned()))
+        if let v = walked as? Variable {
+            return self.extended(with: (variable: v, term: Unassigned(v)))
         }
 
         // If the walked value of the term is a superterm, its subterms should
@@ -249,7 +295,7 @@ public struct State {
 
     let substitution: Substitution
     var nextUnusedName: String {
-        return "_" + String(describing: self.nextId)
+        return "$" + String(describing: self.nextId)
     }
 
     private let nextId: Int
