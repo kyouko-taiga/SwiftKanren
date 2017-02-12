@@ -22,6 +22,10 @@ public struct Variable: Term {
 
     public let name: String
 
+    public init(named name: String) {
+        self.name = name
+    }
+
     public func equals(_ other: Term) -> Bool {
         if other is Variable {
             return (other as! Variable).name == self.name
@@ -155,7 +159,7 @@ public struct Substitution {
 
     public typealias Association = (variable: Variable, term: Term)
 
-    subscript(_ key: Term) -> Term {
+    public subscript(_ key: Term) -> Term {
         // If the given key is a list, we have to walk its elements.
         if let l = key as? List {
             switch l {
@@ -181,14 +185,14 @@ public struct Substitution {
         return key
     }
 
-    func extended(with association: Association) -> Substitution {
+    public func extended(with association: Association) -> Substitution {
         // TODO: Check for introduced circularity.
         var result = self
         result.storage[association.variable] = association.term
         return result
     }
 
-    func unifying(_ u: Term, _ v: Term) -> Substitution? {
+    public func unifying(_ u: Term, _ v: Term) -> Substitution? {
         let walkedU = self[u]
         let walkedV = self[v]
 
@@ -232,7 +236,7 @@ public struct Substitution {
         }
     }
 
-    func reifying(_ term: Term) -> Substitution {
+    public func reifying(_ term: Term) -> Substitution {
         let walked = self[term]
 
         if let v = walked as? Variable {
@@ -253,7 +257,7 @@ public struct Substitution {
         return self
     }
 
-    func reified() -> Substitution {
+    public func reified() -> Substitution {
         var result = self
         for variable in self.storage.keys {
             result = result.reifying(variable)
@@ -284,23 +288,23 @@ extension Substitution: Sequence {
 /// variable.
 public struct State {
 
-    let substitution: Substitution
-    var nextUnusedName: String {
+    fileprivate let substitution: Substitution
+    fileprivate var nextUnusedName: String {
         return "$" + String(describing: self.nextId)
     }
 
     private let nextId: Int
 
-    init(substitution: Substitution = Substitution(), nextId: Int = 0) {
+    public init(substitution: Substitution = Substitution(), nextId: Int = 0) {
         self.substitution = substitution
         self.nextId = nextId
     }
 
-    func with(newSubstitution: Substitution) -> State {
+    fileprivate func with(newSubstitution: Substitution) -> State {
         return State(substitution: newSubstitution, nextId: self.nextId)
     }
 
-    func withNextNewName() -> State {
+    fileprivate func withNextNewName() -> State {
         return State(substitution: self.substitution, nextId: self.nextId + 1)
     }
 
@@ -314,7 +318,7 @@ public enum Stream {
     case immature(thunk: () -> Stream)
 
     // mplus
-    func merge(_ other: Stream) -> Stream {
+    fileprivate func merge(_ other: Stream) -> Stream {
         switch self {
         case .empty:
             return other
@@ -330,7 +334,7 @@ public enum Stream {
     }
 
     // bind
-    func map(_ goal: @escaping Goal) -> Stream {
+    fileprivate func map(_ goal: @escaping Goal) -> Stream {
         switch self {
         case .empty:
             return .empty
@@ -346,7 +350,7 @@ public enum Stream {
     }
 
     // pull
-    func realize() -> Stream {
+    fileprivate func realize() -> Stream {
         switch self {
         case .empty:
             return .empty
@@ -406,7 +410,7 @@ infix operator === : ComparisonPrecedence
 /// The goal takes an existing state and returns (as a lazy stream) either a
 /// state with bindings for the variables in u and v (using unification), or
 /// nothing at all if u and v cannot be unified.
-func ≡ (u: Term, v: Term) -> Goal {
+public func ≡ (u: Term, v: Term) -> Goal {
     return { state in
         if let s = state.substitution.unifying(u, v) {
             return .mature(head: state.with(newSubstitution: s), next: .empty)
@@ -417,7 +421,7 @@ func ≡ (u: Term, v: Term) -> Goal {
 }
 
 /// Alternative for ≡(_:_:)
-func === (u: Term, v: Term) -> Goal {
+public func === (u: Term, v: Term) -> Goal {
     return u ≡ v
 }
 
@@ -427,15 +431,15 @@ func === (u: Term, v: Term) -> Goal {
 /// This function takes a *goal constructor* (i.e. a function), which accepts
 /// a single variable as parameter, and returns a new goal for which the
 /// variable is fresh.
-func fresh(_ constructor: @escaping (Variable) -> Goal) -> Goal {
+public func fresh(_ constructor: @escaping (Variable) -> Goal) -> Goal {
     return { state in
-        constructor(Variable(name: state.nextUnusedName))(state.withNextNewName())
+        constructor(Variable(named: state.nextUnusedName))(state.withNextNewName())
     }
 }
 
 
 /// Constructs a disjunction of goals.
-func || (left: @escaping Goal, right: @escaping Goal) -> Goal {
+public func || (left: @escaping Goal, right: @escaping Goal) -> Goal {
     return { state in
         left(state).merge(right(state))
     }
@@ -443,7 +447,7 @@ func || (left: @escaping Goal, right: @escaping Goal) -> Goal {
 
 
 /// Constructs a conjunction of goals.
-func && (left: @escaping Goal, right: @escaping Goal) -> Goal {
+public func && (left: @escaping Goal, right: @escaping Goal) -> Goal {
     return { state in
         left(state).map(right)
     }
@@ -451,8 +455,14 @@ func && (left: @escaping Goal, right: @escaping Goal) -> Goal {
 
 
 /// Takes a goal and returns a thunk that wraps it.
-func delayed(_ goal: @escaping Goal) -> Goal {
+public func delayed(_ goal: @escaping Goal) -> Goal {
     return { state in
         .immature { goal(state) }
     }
+}
+
+
+/// Executes a logic program (i.e. a goal) with an optional initial state.
+public func solve(withInitialState state: State? = nil, _ program: Goal) -> Stream {
+    return program(state ?? State())
 }

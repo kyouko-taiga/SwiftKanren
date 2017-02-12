@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:/Volumes/Data/Developer/workspace/swift/LogicKit/Playground.playground">
+   </FileRef>
+   <FileRef
+      location = "container:LogicKit.xcodeproj">
+   </FileRef>
+</Workspace>
