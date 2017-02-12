@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_13"
+               BlueprintIdentifier = "OBJ_19"
                BuildableName = "LogicKit.framework"
                BlueprintName = "LogicKit"
                ReferencedContainer = "container:LogicKit.xcodeproj">
@@ -26,8 +26,19 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      codeCoverageEnabled = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "OBJ_26"
+               BuildableName = "LogicKitTests.xctest"
+               BlueprintName = "LogicKitTests"
+               ReferencedContainer = "container:LogicKit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -45,7 +56,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "OBJ_13"
+            BlueprintIdentifier = "OBJ_19"
             BuildableName = "LogicKit.framework"
             BlueprintName = "LogicKit"
             ReferencedContainer = "container:LogicKit.xcodeproj">

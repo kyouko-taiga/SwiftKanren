@@ -7,20 +7,44 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		OBJ_18 /* LogicKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* LogicKit.swift */; };
+		OBJ_24 /* LogicKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* LogicKit.swift */; };
+		OBJ_31 /* SubstitutionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* SubstitutionTests.swift */; };
+		OBJ_32 /* XCTestManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* XCTestManifests.swift */; };
+		OBJ_34 /* LogicKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* LogicKit.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		12CA47AE1E50F03400D94778 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = OBJ_19;
+			remoteInfo = LogicKit;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		OBJ_12 /* LogicKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = LogicKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_12 /* SubstitutionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstitutionTests.swift; sourceTree = "<group>"; };
+		OBJ_13 /* XCTestManifests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTestManifests.swift; sourceTree = "<group>"; };
+		OBJ_17 /* LogicKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LogicKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_18 /* LogicKitTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = LogicKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_9 /* LogicKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicKit.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		OBJ_19 /* Frameworks */ = {
+		OBJ_25 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		OBJ_33 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_34 /* LogicKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -30,14 +54,26 @@
 		OBJ_10 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				OBJ_11 /* LogicKitTests */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		OBJ_11 /* Products */ = {
+		OBJ_11 /* LogicKitTests */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_12 /* LogicKit.framework */,
+				OBJ_12 /* SubstitutionTests.swift */,
+				OBJ_13 /* XCTestManifests.swift */,
+			);
+			name = LogicKitTests;
+			path = Tests/LogicKitTests;
+			sourceTree = SOURCE_ROOT;
+		};
+		OBJ_16 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				OBJ_17 /* LogicKit.framework */,
+				OBJ_18 /* LogicKitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -48,7 +84,7 @@
 				OBJ_6 /* Package.swift */,
 				OBJ_7 /* Sources */,
 				OBJ_10 /* Tests */,
-				OBJ_11 /* Products */,
+				OBJ_16 /* Products */,
 			);
 			name = "";
 			sourceTree = "<group>";
@@ -73,12 +109,12 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		OBJ_13 /* LogicKit */ = {
+		OBJ_19 /* LogicKit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_14 /* Build configuration list for PBXNativeTarget "LogicKit" */;
+			buildConfigurationList = OBJ_20 /* Build configuration list for PBXNativeTarget "LogicKit" */;
 			buildPhases = (
-				OBJ_17 /* Sources */,
-				OBJ_19 /* Frameworks */,
+				OBJ_23 /* Sources */,
+				OBJ_25 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -86,8 +122,25 @@
 			);
 			name = LogicKit;
 			productName = LogicKit;
-			productReference = OBJ_12 /* LogicKit.framework */;
+			productReference = OBJ_17 /* LogicKit.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		OBJ_26 /* LogicKitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = OBJ_27 /* Build configuration list for PBXNativeTarget "LogicKitTests" */;
+			buildPhases = (
+				OBJ_30 /* Sources */,
+				OBJ_33 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				OBJ_35 /* PBXTargetDependency */,
+			);
+			name = LogicKitTests;
+			productName = LogicKitTests;
+			productReference = OBJ_18 /* LogicKitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -105,28 +158,46 @@
 				en,
 			);
 			mainGroup = OBJ_5 /*  */;
-			productRefGroup = OBJ_11 /* Products */;
+			productRefGroup = OBJ_16 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				OBJ_13 /* LogicKit */,
+				OBJ_19 /* LogicKit */,
+				OBJ_26 /* LogicKitTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		OBJ_17 /* Sources */ = {
+		OBJ_23 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_18 /* LogicKit.swift in Sources */,
+				OBJ_24 /* LogicKit.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		OBJ_30 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 0;
+			files = (
+				OBJ_31 /* SubstitutionTests.swift in Sources */,
+				OBJ_32 /* XCTestManifests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		OBJ_35 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = OBJ_19 /* LogicKit */;
+			targetProxy = 12CA47AE1E50F03400D94778 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-		OBJ_15 /* Debug */ = {
+		OBJ_21 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -146,7 +217,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_16 /* Release */ = {
+		OBJ_22 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -163,6 +234,40 @@
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				TARGET_NAME = LogicKit;
+			};
+			name = Release;
+		};
+		OBJ_28 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = LogicKit.xcodeproj/LogicKitTests_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				TARGET_NAME = LogicKitTests;
+			};
+			name = Debug;
+		};
+		OBJ_29 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = LogicKit.xcodeproj/LogicKitTests_Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				TARGET_NAME = LogicKitTests;
 			};
 			name = Release;
 		};
@@ -211,20 +316,29 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		OBJ_14 /* Build configuration list for PBXNativeTarget "LogicKit" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				OBJ_15 /* Debug */,
-				OBJ_16 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
 		OBJ_2 /* Build configuration list for PBXProject "LogicKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				OBJ_3 /* Debug */,
 				OBJ_4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		OBJ_20 /* Build configuration list for PBXNativeTarget "LogicKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_21 /* Debug */,
+				OBJ_22 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		OBJ_27 /* Build configuration list for PBXNativeTarget "LogicKitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				OBJ_28 /* Debug */,
+				OBJ_29 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
