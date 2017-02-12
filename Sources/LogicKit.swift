@@ -160,24 +160,13 @@ public struct Substitution {
     public typealias Association = (variable: Variable, term: Term)
 
     public subscript(_ key: Term) -> Term {
-        // If the given key is a list, we have to walk its elements.
-        if let l = key as? List {
-            switch l {
-            case .empty:
-                return l
-            case .cons(let h, let t):
-                return List.cons(self[h], self[t])
-            }
-        }
-
         // If the the given key isn't a variable, we can just give it back.
         guard let k = key as? Variable else {
             return key
         }
 
         if let rhs = self.storage[k] {
-            // Continue walking in case the rhs is another variable, or a
-            // superterm whose subterms should also be walked.
+            // Continue walking in case the rhs is another variable.
             return self[rhs]
         }
 
@@ -186,7 +175,13 @@ public struct Substitution {
     }
 
     public func extended(with association: Association) -> Substitution {
+
+        // NOTE: William Byrd's PhD thesis doesn't specify what is the
+        // expected behaviour when extending a substitution map with an
+        // already existing key.
+
         // TODO: Check for introduced circularity.
+
         var result = self
         result.storage[association.variable] = association.term
         return result
@@ -236,33 +231,42 @@ public struct Substitution {
         }
     }
 
-    public func reifying(_ term: Term) -> Substitution {
-        let walked = self[term]
-
-        if let v = walked as? Variable {
-            return self.extended(with: (variable: v, term: Unassigned(v)))
+    public func reified() -> Substitution {
+        var result = Substitution()
+        for variable in self.storage.keys {
+            let walked = self.deepWalk(variable)
+            if let v = walked as? Variable {
+                result = result.extended(with: (variable: variable, term: Unassigned(v)))
+            } else {
+                result = result.extended(with: (variable: variable, term: walked))
+            }
         }
+        return result
+    }
 
-        // If the walked value of the term is a list, its elements should be
-        // reified as well.
-        if let l = walked as? List {
+    private func deepWalk(_ key: Term) -> Term {
+        // If the given key is a list, we have to "deep" walk its elements.
+        if let l = key as? List {
             switch l {
             case .empty:
-                return self
+                return l
             case .cons(let h, let t):
-                return self.reifying(h).reifying(t)
+                return List.cons(self.deepWalk(h), self.deepWalk(t))
             }
         }
 
-        return self
-    }
-
-    public func reified() -> Substitution {
-        var result = self
-        for variable in self.storage.keys {
-            result = result.reifying(variable)
+        // If the the given key isn't a variable, we can just give it back.
+        guard let k = key as? Variable else {
+            return key
         }
-        return result
+
+        if let rhs = self.storage[k] {
+            // Continue walking in case the rhs is another variable.
+            return self.deepWalk(rhs)
+        }
+
+        // We give back the variable if is not associated.
+        return key
     }
 
 }
