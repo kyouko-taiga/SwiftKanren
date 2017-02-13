@@ -65,7 +65,7 @@ Such structures should be mapped to lists for the time being.
 
 ### Goals
 
-At its core, LogicKit uses [unification](https://en.wikipedia.org/wiki/Unification_(computer_science), a kind of pattern matching, to solve programs.
+At its core, LogicKit uses [unification](https://en.wikipedia.org/wiki/Unification_(computer_science)), a kind of pattern matching, to solve programs.
 This process is used to build a substitution map that associates the logic variables of the program with their possible values.
 On the top of that, a handful of operators allows to define *goals*, a fancy name to designate functions that map a program to a stream of substitutions for which its relations hold.
 
