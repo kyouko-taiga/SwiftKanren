@@ -89,6 +89,16 @@ func head(of result: Term, is head: Term) -> Goal {
 }
 ```
 
+## Examples
+
+Some examples of usage are presented inside `Examples/`.
+To run those examples, navigate to their directory (where `main.swift` lies) and execute the following:
+
+```bash
+swift build
+.build/debug/<name of the example>
+```
+
 ## References
 
 * William Byrd's [PhD thesis](http://gradworks.umi.com/3380156.pdf).
