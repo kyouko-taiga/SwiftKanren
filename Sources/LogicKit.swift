@@ -17,6 +17,19 @@ public protocol Term {
 
 }
 
+extension Term where Self: Equatable {
+
+    public func equals(_ other: Term) -> Bool {
+        if other is Self {
+            return (other as! Self) == self
+        }
+
+        return false
+    }
+
+}
+
+
 
 public struct Variable: Term {
 
@@ -24,14 +37,6 @@ public struct Variable: Term {
 
     public init(named name: String) {
         self.name = name
-    }
-
-    public func equals(_ other: Term) -> Bool {
-        if other is Variable {
-            return (other as! Variable).name == self.name
-        }
-
-        return false
     }
 
 }
