@@ -158,6 +158,104 @@ public enum List: Term {
 }
 
 
+public struct Map: Term {
+
+    public typealias StorageType = [String: Term]
+
+    fileprivate let storage: StorageType
+
+    public init() {
+        self.storage = [:]
+    }
+
+    public init<S: Sequence>(_ items: S) where S.Iterator.Element == (key: String, value: Term) {
+        var storage = StorageType()
+        for (key, value) in items {
+            storage[key] = value
+        }
+        self.storage = storage
+    }
+
+    public var keys: LazyMapCollection<StorageType, String> {
+        return self.storage.keys
+    }
+
+    public var values: LazyMapCollection<StorageType, Term> {
+        return self.storage.values
+    }
+
+}
+
+extension Map: Equatable {
+
+    public static func == (left: Map, right: Map) -> Bool {
+        let leftKeys = left.storage.keys.sorted()
+        let rightKeys = right.storage.keys.sorted()
+
+        guard leftKeys == rightKeys else {
+            return false
+        }
+
+        for (leftKey, rightKey) in zip(leftKeys, rightKeys) {
+            guard left.storage[leftKey]!.equals(right.storage[rightKey]!) else {
+                return false
+            }
+        }
+
+        return true
+    }
+
+}
+
+extension Map: Sequence {
+
+    public func makeIterator() -> StorageType.Iterator {
+        return self.storage.makeIterator()
+    }
+
+}
+
+extension Map: Collection {
+
+    public var startIndex: StorageType.Index {
+        return self.storage.startIndex
+    }
+
+    public var endIndex: StorageType.Index {
+        return self.storage.endIndex
+    }
+
+    public func index(after: StorageType.Index) -> StorageType.Index {
+        return self.storage.index(after: after)
+    }
+
+    public subscript(index: StorageType.Index) -> StorageType.Element {
+        return self.storage[index]
+    }
+
+    public subscript(key: String) -> Term? {
+        return self.storage[key]
+    }
+
+}
+
+extension Map: ExpressibleByDictionaryLiteral {
+
+    public init(dictionaryLiteral elements: (String, Term)...) {
+        self.init(elements.map { (key: $0.0, value: $0.1) })
+    }
+
+}
+
+extension Map: CustomStringConvertible {
+
+    public var description: String {
+        return String(describing: self.storage)
+    }
+    
+}
+
+
 public struct Substitution {
 
     fileprivate var storage = [Variable: Term]()
@@ -216,6 +314,12 @@ public struct Substitution {
             return self.unifyingLists(walkedU as! List, walkedV as! List)
         }
 
+        // If the walked values of u and of v are maps, then unifying them
+        // boils down to unifying their elements.
+        if (walkedU is Map) && (walkedV is Map) {
+            return self.unifyingMaps(walkedU as! Map, walkedV as! Map)
+        }
+
         return nil
     }
 
@@ -234,6 +338,24 @@ public struct Substitution {
             // Unifying a non-empty list with an empty list always fail.
             return nil
         }
+    }
+
+    private func unifyingMaps(_ u: Map, _ v: Map) -> Substitution? {
+        let leftKeys = u.keys.sorted()
+        let rightKeys = v.keys.sorted()
+
+        // Unifying dictionaries with different keys always fail.
+        guard leftKeys == rightKeys else {
+            return nil
+        }
+
+        // Unifying dictionaires boils down to unifying the values associated,
+        // with each of their respective keys.
+        var result: Substitution? = self
+        for (leftKey, rightKey) in zip(leftKeys, rightKeys) {
+            result = result?.unifying(u[leftKey]!, v[rightKey]!)
+        }
+        return result
     }
 
     public func reified() -> Substitution {

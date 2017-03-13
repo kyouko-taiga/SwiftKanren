@@ -26,7 +26,7 @@ for solution in solutions {
 // Prints "x = 1, y = 1"
 ```
 
-### Values and lists
+### Values, lists and maps
 
 Out of the box, LogicKit offers a `Value<T>` type, which can be used to associate logic variables to values.
 Any type can be used, as long as `T` is `Equatable`.
@@ -55,13 +55,34 @@ let rhs = List.cons(y, List.cons(Value(2), List.empty))
 for solution in solve(lhs ≡ rhs) {
     print("x = \(solution[x]), y = \(solution[y])")
 }
+
 // Prints "x = 2, y = 1"
+```
+
+A `Map` type is also supported, which mimics Swift's dictionaries:
+
+```swift
+import LogicKit
+
+let x = Variable(named: "x")
+
+let m: Map = ["message": x]
+let n: Map = ["message": Value("Hello!")]
+let o: Map = ["message": Value("Goodbye!")]
+
+let system = (m ≡ n) || (m ≡ o)
+for solution in solve(system) {
+    print(solution[x])
+}
+
+// Prints "Hello!"
+// Prints "Goodbye!"
 ```
 
 Any type that conforms to `Term` can be used as a value.
 The only requirement of the protocol is to implement a function `equals(_:) -> Bool` that LogicKit will use to match values.
 However, it is currently not supported to define custom types for terms with subterms.
-Such structures should be mapped to lists for the time being.
+Such structures should be mapped to lists or maps for the time being.
 
 ### Goals
 
