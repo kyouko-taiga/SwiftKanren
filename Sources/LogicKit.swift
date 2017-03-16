@@ -58,7 +58,7 @@ extension Variable: CustomStringConvertible {
     public var description: String {
         return self.name
     }
-    
+
 }
 
 
@@ -154,7 +154,7 @@ public enum List: Term {
             return false
         }
     }
-    
+
 }
 
 
@@ -182,6 +182,16 @@ public struct Map: Term {
 
     public var values: LazyMapCollection<StorageType, Term> {
         return self.storage.values
+    }
+
+    public subscript(key: String) -> Term? {
+        return self.storage[key]
+    }
+
+    public func with(key: String, value: Term) -> Map {
+        var newStorage = self.storage
+        newStorage[key] = value
+        return Map(newStorage)
     }
 
 }
@@ -233,10 +243,6 @@ extension Map: Collection {
         return self.storage[index]
     }
 
-    public subscript(key: String) -> Term? {
-        return self.storage[key]
-    }
-
 }
 
 extension Map: ExpressibleByDictionaryLiteral {
@@ -252,7 +258,7 @@ extension Map: CustomStringConvertible {
     public var description: String {
         return String(describing: self.storage)
     }
-    
+
 }
 
 
@@ -371,9 +377,9 @@ public struct Substitution {
         return result
     }
 
-    private func deepWalk(_ key: Term) -> Term {
-        // If the given key is a list, we have to "deep" walk its elements.
-        if let l = key as? List {
+    private func deepWalk(_ value: Term) -> Term {
+        // If the given value is a list, we have to "deep" walk its elements.
+        if let l = value as? List {
             switch l {
             case .empty:
                 return l
@@ -382,18 +388,27 @@ public struct Substitution {
             }
         }
 
-        // If the the given key isn't a variable, we can just give it back.
-        guard let k = key as? Variable else {
-            return key
+        // If the given value is a map, we have to "deep" walk its values.
+        if let m = value as? Map {
+            var reifiedMap = Map()
+            for item in m {
+                reifiedMap = reifiedMap.with(key: item.key, value: self.deepWalk(item.value))
+            }
+            return reifiedMap
         }
 
-        if let rhs = self.storage[k] {
+        // If the the given value isn't a variable, we can just give it back.
+        guard let key = value as? Variable else {
+            return value
+        }
+
+        if let rhs = self.storage[key] {
             // Continue walking in case the rhs is another variable.
             return self.deepWalk(rhs)
         }
 
         // We give back the variable if is not associated.
-        return key
+        return value
     }
 
 }

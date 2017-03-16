@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Volumes/Data/Developer/workspace/swift/LogicKit/Playground.playground">
+      location = "group:Playground.playground">
    </FileRef>
    <FileRef
       location = "container:LogicKit.xcodeproj">
