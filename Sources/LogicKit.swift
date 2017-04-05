@@ -638,7 +638,7 @@ public func && (left: @escaping Goal, right: @escaping Goal) -> Goal {
 ///
 /// This function takes a *goal constructor* (i.e. a function), which accepts
 /// a substitution as parameter, and returns a new goal.
-public func in_environment (_ constructor: @escaping (Substitution) -> Goal) -> Goal {
+public func inEnvironment (_ constructor: @escaping (Substitution) -> Goal) -> Goal {
     return { state in
         let reified = state.substitution.reified()
         return constructor(reified)(state)
