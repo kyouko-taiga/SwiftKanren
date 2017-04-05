@@ -658,3 +658,11 @@ public func delayed(_ goal: @escaping Goal) -> Goal {
 public func solve(withInitialState state: State? = nil, _ program: Goal) -> Stream {
     return program(state ?? State())
 }
+
+
+/// A goal that always succeeds.
+public let success = (Value(true) === Value(true))
+
+
+/// A goal that always fails.
+public let failure = (Value(false) === Value(true))
