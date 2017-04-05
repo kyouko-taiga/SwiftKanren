@@ -671,7 +671,7 @@ public let failure = (Value(false) === Value(true))
 /// Creates a goal that tests if a term is an instance of a `Value<T>`
 /// in the current substitution.
 public func isValue<T : Equatable>(_ term: Term, _ type: T.Type) -> Goal {
-    return in_environment { substitution in
+    return inEnvironment { substitution in
         if substitution [term] is Value<T> {
           return success
         } else {
@@ -684,7 +684,7 @@ public func isValue<T : Equatable>(_ term: Term, _ type: T.Type) -> Goal {
 /// Creates a goal that tests if a term is an instance of a `Variable`
 /// in the current substitution.
 public func isVariable(_ term: Term) -> Goal {
-    return in_environment { substitution in
+    return inEnvironment { substitution in
         if substitution [term] is Variable {
           return success
         } else {
@@ -697,7 +697,7 @@ public func isVariable(_ term: Term) -> Goal {
 /// Creates a goal that tests if a term is an instance of a `List`
 /// in the current substitution.
 public func isList(_ term: Term) -> Goal {
-    return in_environment { substitution in
+    return inEnvironment { substitution in
         if substitution [term] is List {
           return success
         } else {
@@ -710,7 +710,7 @@ public func isList(_ term: Term) -> Goal {
 /// Creates a goal that tests if a term is an instance of a `Map`
 /// in the current substitution.
 public func isMap(_ term: Term) -> Goal {
-    return in_environment { substitution in
+    return inEnvironment { substitution in
         if substitution [term] is Map {
           return success
         } else {
