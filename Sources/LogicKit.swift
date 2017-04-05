@@ -80,7 +80,7 @@ public class VariableFactory {
         self.state = self.state.withNextNewName()
         return self.variables[name]!
     }
-    
+
 }
 
 
