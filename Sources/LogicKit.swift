@@ -634,6 +634,18 @@ public func && (left: @escaping Goal, right: @escaping Goal) -> Goal {
 }
 
 
+/// Takes a goal constructor and returns a goal with substitution.
+///
+/// This function takes a *goal constructor* (i.e. a function), which accepts
+/// a substitution as parameter, and returns a new goal.
+public func in_environment (_ constructor: @escaping (Substitution) -> Goal) -> Goal {
+    return { state in
+        let reified = state.substitution.reified()
+        return constructor(reified)(state)
+    }
+}
+
+
 /// Takes a goal and returns a thunk that wraps it.
 public func delayed(_ goal: @escaping Goal) -> Goal {
     return { state in
