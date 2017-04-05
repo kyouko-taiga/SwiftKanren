@@ -80,7 +80,7 @@ public class VariableFactory {
         self.state = self.state.withNextNewName()
         return self.variables[name]!
     }
-    
+
 }
 
 
@@ -634,6 +634,18 @@ public func && (left: @escaping Goal, right: @escaping Goal) -> Goal {
 }
 
 
+/// Takes a goal constructor and returns a goal with substitution.
+///
+/// This function takes a *goal constructor* (i.e. a function), which accepts
+/// a substitution as parameter, and returns a new goal.
+public func inEnvironment (_ constructor: @escaping (Substitution) -> Goal) -> Goal {
+    return { state in
+        let reified = state.substitution.reified()
+        return constructor(reified)(state)
+    }
+}
+
+
 /// Takes a goal and returns a thunk that wraps it.
 public func delayed(_ goal: @escaping Goal) -> Goal {
     return { state in
@@ -645,4 +657,64 @@ public func delayed(_ goal: @escaping Goal) -> Goal {
 /// Executes a logic program (i.e. a goal) with an optional initial state.
 public func solve(withInitialState state: State? = nil, _ program: Goal) -> Stream {
     return program(state ?? State())
+}
+
+
+/// A goal that always succeeds.
+public let success = (Value(true) === Value(true))
+
+
+/// A goal that always fails.
+public let failure = (Value(false) === Value(true))
+
+
+/// Creates a goal that tests if a term is an instance of a `Value<T>`
+/// in the current substitution.
+public func isValue<T : Equatable>(_ term: Term, _ type: T.Type) -> Goal {
+    return in_environment { substitution in
+        if substitution [term] is Value<T> {
+          return success
+        } else {
+          return failure
+        }
+    }
+}
+
+
+/// Creates a goal that tests if a term is an instance of a `Variable`
+/// in the current substitution.
+public func isVariable(_ term: Term) -> Goal {
+    return in_environment { substitution in
+        if substitution [term] is Variable {
+          return success
+        } else {
+          return failure
+        }
+    }
+}
+
+
+/// Creates a goal that tests if a term is an instance of a `List`
+/// in the current substitution.
+public func isList(_ term: Term) -> Goal {
+    return in_environment { substitution in
+        if substitution [term] is List {
+          return success
+        } else {
+          return failure
+        }
+    }
+}
+
+
+/// Creates a goal that tests if a term is an instance of a `Map`
+/// in the current substitution.
+public func isMap(_ term: Term) -> Goal {
+    return in_environment { substitution in
+        if substitution [term] is Map {
+          return success
+        } else {
+          return failure
+        }
+    }
 }
