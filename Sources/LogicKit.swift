@@ -71,7 +71,7 @@ public class VariableFactory {
         self.state = state
     }
 
-    subscript(name: String) -> Variable {
+    public subscript(name: String) -> Variable {
         if let variable = self.variables[name] {
             return variable
         }
