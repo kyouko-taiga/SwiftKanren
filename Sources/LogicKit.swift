@@ -86,7 +86,7 @@ public class VariableFactory {
 
 public struct Value<T: Equatable>: Term {
 
-    fileprivate let wrapped: T
+    public let wrapped: T
 
     public init(_ val: T) {
         self.wrapped = val
