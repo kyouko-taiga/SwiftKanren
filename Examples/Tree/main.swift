@@ -1,11 +1,11 @@
 //
-//  A LogicKit usage example that showcases the use of maps.
+//  A SwiftKanren usage example that showcases the use of maps.
 //
 //  Created by Dimitri Racordon on 16.03.17.
 //  Copyright © 2017 University of Geneva. All rights reserved.
 //
 
-import LogicKit
+import SwiftKanren
 
 
 // First, we define the natural numbers with some operations.

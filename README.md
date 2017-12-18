@@ -1,16 +1,14 @@
-# LogicKit
+# SwiftKanren
 
-[![Build Status](https://travis-ci.org/kyouko-taiga/LogicKit.svg?branch=master)](https://travis-ci.org/kyouko-taiga/LogicKit)
-
-LogicKit is a Swift implementation of [miniKanren](http://minikanren.org), allowing one to write logic programs in Swift.
+SwiftKanren is a Swift implementation of [miniKanren](http://minikanren.org), allowing one to write logic programs in Swift.
 
 ## Getting started
 
-Like all kanren implementations, LogicKit allows one to define a logic program in terms of relations, and search for values which satisfy such relations.
+Like all kanren implementations, SwiftKanren allows one to define a logic program in terms of relations, and search for values which satisfy such relations.
 For instance, the following program searches a value for `x` and `y` such that `x = y ∧ (y = 0 ∨ y = 1)` holds:
 
 ```swift
-import LogicKit
+import SwiftKanren
 
 let x = Variable(named: "x")
 let y = Variable(named: "y")
@@ -28,23 +26,23 @@ for solution in solutions {
 
 ### Values, lists and maps
 
-Out of the box, LogicKit offers a `Value<T>` type, which can be used to associate logic variables to values.
+Out of the box, SwiftKanren offers a `Value<T>` type, which can be used to associate logic variables to values.
 Any type can be used, as long as `T` is `Equatable`.
 Like in most kanren implementations, lists are also supported, and proposed in the form of linked list.
 
 ```swift
-import LogicKit
+import SwiftKanren
 
 // The following represents the list [0, 1]
 let l = List.cons(Value(0), List.cons(Value(1), List.empty))
 ```
 
-Unlike Swift arrays, LogicKit lists can contain mixed elements, as long as they all conform to `Term`.
-This means it's of course possible to mix logic variables with values, and ask LogicKit to search for values inside a list.
+Unlike Swift arrays, SwiftKanren lists can contain mixed elements, as long as they all conform to `Term`.
+This means it's of course possible to mix logic variables with values, and ask SwiftKanren to search for values inside a list.
 For instance, the following program searches a value for `x` and `y` such that `[1, x] = [y, 2]` holds:
 
 ```swift
-import LogicKit
+import SwiftKanren
 
 let x = Variable(named: "x")
 let y = Variable(named: "y")
@@ -62,7 +60,7 @@ for solution in solve(lhs ≡ rhs) {
 A `Map` type is also supported, which mimics Swift's dictionaries:
 
 ```swift
-import LogicKit
+import SwiftKanren
 
 let x = Variable(named: "x")
 
@@ -80,13 +78,13 @@ for solution in solve(system) {
 ```
 
 Any type that conforms to `Term` can be used as a value.
-The only requirement of the protocol is to implement a function `equals(_:) -> Bool` that LogicKit will use to match values.
+The only requirement of the protocol is to implement a function `equals(_:) -> Bool` that SwiftKanren will use to match values.
 However, it is currently not supported to define custom types for terms with subterms.
 Such structures should be mapped to lists or maps for the time being.
 
 ### Goals
 
-At its core, LogicKit uses [unification](https://en.wikipedia.org/wiki/Unification_(computer_science)), a kind of pattern matching, to solve programs.
+At its core, SwiftKanren uses [unification](https://en.wikipedia.org/wiki/Unification_(computer_science)), a kind of pattern matching, to solve programs.
 This process is used to build a substitution map that associates the logic variables of the program with their possible values.
 On the top of that, a handful of operators allows to define *goals*, a fancy name to designate functions that map a program to a stream of substitutions for which its relations hold.
 

@@ -1,4 +1,3 @@
 import PackageDescription
 
-
-let package = Package(name: "LogicKit")
+let package = Package(name: "SwiftKanren")

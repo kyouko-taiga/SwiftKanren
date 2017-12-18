@@ -1,11 +1,11 @@
 //
-//  A LogicKit usage example that showcases the use of predicates.
+//  A SwiftKanren usage example that showcases the use of predicates.
 //
 //  Created by Dimitri Racordon on 12.02.17.
 //  Copyright © 2017 University of Geneva. All rights reserved.
 //
 
-import LogicKit
+import SwiftKanren
 
 
 // First, we create an enumeration to represent the different Pokemon.
