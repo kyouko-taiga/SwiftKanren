@@ -104,7 +104,7 @@ public struct Value<T: Equatable>: Term {
 
 extension Value: Equatable {
 
-    public static func == <T: Equatable>(lhs: Value<T>, rhs: Value<T>) -> Bool {
+    public static func ==(lhs: Value, rhs: Value) -> Bool {
         return lhs.wrapped == rhs.wrapped
     }
 
